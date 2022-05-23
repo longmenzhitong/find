@@ -1,2 +1,2 @@
 # find
-一个小型的命令行工具，用来随时随地记录和查找有用的信息。
+A tiny command tool for finding and recording useful information in any time.

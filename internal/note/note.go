@@ -130,11 +130,11 @@ func Write(notes *[]string, mod int) error {
 
 // Delete is used to remove note from local data file after optional confirming,
 // and will asynchronously update the backup if the redis config is available.
-func Delete(keyword string, confirm bool) error {
+func Delete(keyword string, confirm bool, accurate bool) error {
 	var yesOrNo string
 	if confirm {
 		fmt.Println("Will delete:")
-		_, err := Find(keyword, true, true, true)
+		_, err := Find(keyword, true, accurate, true)
 		if err != nil {
 			return fmt.Errorf("find %s error: %v", keyword, err)
 		}
@@ -149,7 +149,7 @@ func Delete(keyword string, confirm bool) error {
 	}
 
 	if yesOrNo == constant.Yes {
-		notes, err := Find(keyword, false, true, false)
+		notes, err := Find(keyword, false, accurate, false)
 		if err != nil {
 			return fmt.Errorf("find %s error: %v", keyword, err)
 		}

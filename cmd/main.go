@@ -6,7 +6,6 @@ import (
 	"find/internal/stdin"
 	"fmt"
 	"os"
-	"strings"
 )
 
 func init() {
@@ -28,53 +27,49 @@ func main() {
 			continue
 		}
 
-		_order := order.Parse(input)
-		keyword := strings.TrimSpace(strings.TrimPrefix(input, _order))
+		param := order.Param(input)
 
-		switch _order {
+		switch order.Order(input) {
 		case order.Find:
-			_, err = note.Find(keyword, true, false, true)
+			_, err = note.Find(param, true, false, true)
 			if err != nil {
-				fmt.Printf("find %s error: %s\n", keyword, err.Error())
+				fmt.Printf("find %s error: %s\n", param, err.Error())
 				continue
 			}
 		case order.Add:
-			same, err := note.Find(note.GetKey(keyword), true, true, false)
+			same, err := note.Find(note.GetKey(param), true, true, false)
 			if err != nil {
-				fmt.Printf("find %s error: %s\n", note.GetKey(keyword), err.Error())
+				fmt.Printf("find %s error: %s\n", note.GetKey(param), err.Error())
 				continue
 			}
 			if len(same) > 0 {
 				fmt.Println("Duplicate key.")
 				continue
 			}
-			err = note.Write(&[]string{keyword}, os.O_APPEND)
+			err = note.Write(&[]string{param}, os.O_APPEND)
 			if err != nil {
 				fmt.Printf("append note error: %s\n", err.Error())
 				continue
 			}
 			succeed()
 		case order.Delete:
-			err = note.Delete(keyword, true)
-			if err != nil {
-				fmt.Printf("delete note error: %s\n", err.Error())
-				continue
-			}
-			succeed()
-		case order.FastDelete:
-			err = note.Delete(keyword, false)
+			var fast bool
+			var all bool
+			fast, param = order.Fast(param)
+			all, param = order.All(param)
+			err = note.Delete(param, !fast, !all)
 			if err != nil {
 				fmt.Printf("delete note error: %s\n", err.Error())
 				continue
 			}
 			succeed()
 		case order.Modify:
-			err = note.Delete(note.GetKey(keyword), false)
+			err = note.Delete(note.GetKey(param), false, true)
 			if err != nil {
-				fmt.Printf("delete %s error: %s\n", note.GetKey(keyword), err.Error())
+				fmt.Printf("delete %s error: %s\n", note.GetKey(param), err.Error())
 				continue
 			}
-			err = note.Write(&[]string{keyword}, os.O_APPEND)
+			err = note.Write(&[]string{param}, os.O_APPEND)
 			if err != nil {
 				fmt.Printf("append note error: %s\n", err.Error())
 				continue

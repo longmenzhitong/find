@@ -162,6 +162,20 @@ func Delete(keyword string, confirm bool, accurate bool) error {
 	return nil
 }
 
+// Modify is used to update note in local date file by delete and write,
+// and will asynchronously update the backup if the redis config is available.
+func Modify(note string) error {
+	err := Delete(GetKey(note), false, true)
+	if err != nil {
+		return fmt.Errorf("delete %s error: %v", GetKey(note), err)
+	}
+	err = Write(&[]string{note}, os.O_APPEND)
+	if err != nil {
+		return fmt.Errorf("append %s error: %v", note, err)
+	}
+	return nil
+}
+
 // GetKey is used to parse key of note, returning the key.
 func GetKey(note string) string {
 	i := strings.Index(note, ":")

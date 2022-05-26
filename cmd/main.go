@@ -1,8 +1,10 @@
 package main
 
 import (
+	"find/internal/config"
 	"find/internal/note"
 	"find/internal/order"
+	"find/internal/reminder"
 	"find/internal/stdin"
 	"fmt"
 	"os"
@@ -16,6 +18,13 @@ func init() {
 }
 
 func main() {
+	if config.ReminderEnabled {
+		err := reminder.Start()
+		if err != nil {
+			fmt.Printf("start reminder error: %s\n", err.Error())
+		}
+	}
+
 	fmt.Println("=================")
 	fmt.Println("Welcome to FIND!")
 	fmt.Println("=================")
@@ -64,14 +73,9 @@ func main() {
 			}
 			succeed()
 		case order.Modify:
-			err = note.Delete(note.GetKey(param), false, true)
+			err = note.Modify(param)
 			if err != nil {
-				fmt.Printf("delete %s error: %s\n", note.GetKey(param), err.Error())
-				continue
-			}
-			err = note.Write(&[]string{param}, os.O_APPEND)
-			if err != nil {
-				fmt.Printf("append note error: %s\n", err.Error())
+				fmt.Printf("modify %s error: %s\n", param, err.Error())
 				continue
 			}
 			succeed()

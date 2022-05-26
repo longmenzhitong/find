@@ -17,6 +17,8 @@ var ConfPath string
 var NotePath string
 var RdsConf *redis.Options
 var RdsKey string
+var ReminderEnabled = true
+var ReminderIntervalSeconds = 1
 
 func init() {
 	RdsConf = &redis.Options{}
@@ -52,21 +54,31 @@ func init() {
 		key := line[:i]
 		val := line[i+1:]
 		switch key {
-		case "username":
+		case "find.username":
 			Username = val
-		case "password":
+		case "find.password":
 			Password = val
-		case "rdsaddr":
+		case "rds.addr":
 			RdsConf.Addr = val
-		case "rdspswd":
+		case "rds.password":
 			RdsConf.Password = val
-		case "rdsdb":
+		case "rds.db":
 			RdsConf.DB, err = strconv.Atoi(val)
 			if err != nil {
-				fmt.Printf("invalid redis db: %s", val)
+				fmt.Printf("invalid redis db: %s\n", val)
 			}
 		case "notePath":
 			NotePath = val
+		case "reminder.enabled":
+			ReminderEnabled, err = strconv.ParseBool(val)
+			if err != nil {
+				fmt.Printf("invalid reminder enabled: %s\n", val)
+			}
+		case "reminder.interval-seconds":
+			ReminderIntervalSeconds, err = strconv.Atoi(val)
+			if err != nil {
+				fmt.Printf("invalid reminder interval seconds: %s\n", val)
+			}
 		default:
 		}
 	}

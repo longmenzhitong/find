@@ -17,7 +17,7 @@ import (
 var Path string
 
 func init() {
-	Path = config.NotePath
+	Path = config.Conf.Find.NotePath
 }
 
 // Check is used to ensure that the note is available,

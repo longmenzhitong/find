@@ -2,6 +2,7 @@
 package config
 
 import (
+	"find/internal/files"
 	"fmt"
 	"github.com/go-redis/redis"
 	"gopkg.in/yaml.v2"
@@ -12,6 +13,7 @@ import (
 // Config map to program config yaml.
 type Config struct {
 	Find struct {
+		NotePath string `yaml:"notePath"`
 		Username string `yaml:"username"`
 		Password string `yaml:"password"`
 	} `yaml:"find"`
@@ -27,8 +29,6 @@ type Config struct {
 }
 
 // all configs
-var ConfPath string
-var NotePath string
 var Conf Config
 
 func init() {
@@ -37,24 +37,21 @@ func init() {
 		panic(err)
 	}
 	// default unchangeable config path
-	ConfPath = homedir + "\\FIND.yml"
-	// default changeable note path
-	NotePath = homedir + "\\FIND.txt"
+	confPath := homedir + "\\FIND.yml"
 
-	// If config file not exists, then create.
-	if _, err = os.Stat(ConfPath); err != nil {
-		_, err = os.Create(ConfPath)
+	// If config yaml not exists, then init.
+	if _, err = os.Stat(confPath); err != nil {
+		err = initYaml(confPath)
 		if err != nil {
-			fmt.Printf("create config file error: %s\n", err.Error())
+			fmt.Printf("init yaml error: %s\n", err)
 			return
 		}
-		return
 	}
 
 	// parse config from yaml
-	file, err := ioutil.ReadFile(ConfPath)
+	file, err := ioutil.ReadFile(confPath)
 	if err != nil {
-		fmt.Printf("read file from %s error: %s\n", ConfPath, err.Error())
+		fmt.Printf("read file from %s error: %s\n", confPath, err.Error())
 		return
 	}
 	err = yaml.Unmarshal(file, &Conf)
@@ -79,4 +76,37 @@ func RedisConf() *redis.Options {
 		Password: Conf.Redis.Password,
 		DB:       Conf.Redis.Db,
 	}
+}
+
+// initYaml is used to create config yaml and write initial configs.
+func initYaml(confPath string) error {
+	file, err := os.Create(confPath)
+	if err != nil {
+		return fmt.Errorf("create config file error: %v", err)
+	}
+
+	homedir, err := os.UserHomeDir()
+	if err != nil {
+		panic(err)
+	}
+
+	initialConfigs := []string{
+		"find:",
+		fmt.Sprintf("  notePath: %s", homedir+"\\FIND.txt"),
+		"  username:",
+		"  password:",
+		"redis:",
+		"  address:",
+		"  password:",
+		"  db:",
+		"reminder:",
+		"  enabled: true",
+		"  interval-seconds: 1",
+	}
+	err = files.WriteLinesToFile(file, &initialConfigs)
+	if err != nil {
+		return fmt.Errorf("write initial configs to file error: %v", err)
+	}
+
+	return nil
 }

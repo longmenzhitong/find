@@ -113,7 +113,7 @@ func getLatest() (*redis.Z, error) {
 func push(file *os.File, lastModTime float64) error {
 	notes, err := files.ReadLinesFromFile(file)
 	if err != nil {
-		return fmt.Errorf("read lines from %s error: %v", config.NotePath, err)
+		return fmt.Errorf("read lines from %s error: %v", config.Conf.Find.NotePath, err)
 	}
 
 	if len(notes) == 0 {

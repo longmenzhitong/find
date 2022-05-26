@@ -18,7 +18,7 @@ func init() {
 }
 
 func main() {
-	if config.ReminderEnabled {
+	if config.Conf.Reminder.Enabled {
 		err := reminder.Start()
 		if err != nil {
 			fmt.Printf("start reminder error: %s\n", err.Error())

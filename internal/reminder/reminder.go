@@ -19,7 +19,7 @@ const reminded = "reminded@"
 // for notified notes to avoid duplicate notifications.
 func Start() error {
 	c := cron.New()
-	spec := fmt.Sprintf("*/%d * * * * ?", config.ReminderIntervalSeconds)
+	spec := fmt.Sprintf("*/%d * * * * ?", config.Conf.Reminder.IntervalSeconds)
 	err := c.AddFunc(spec, func() {
 		notes, err := note.Find("todo", true, false, false)
 		if err != nil {

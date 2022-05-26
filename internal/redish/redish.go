@@ -12,8 +12,8 @@ import (
 var Client *redis.Client
 
 func init() {
-	if config.RdsConf.Addr != "" {
-		client := redis.NewClient(config.RdsConf)
+	if config.Conf.Redis.Address != "" {
+		client := redis.NewClient(config.RedisConf())
 		_, err := client.Ping().Result()
 		if err != nil {
 			fmt.Printf("ping redis error: %s\n", err.Error())

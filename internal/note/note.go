@@ -43,7 +43,7 @@ func Check() error {
 		_ = file.Close()
 	}()
 
-	if config.RdsKey != "" && redish.Client != nil {
+	if config.RedisKey() != "" && redish.Client != nil {
 		// If redis config is available, then sync.
 		err = backup.Sync(isNewNote, file, fileInfo)
 		if err != nil {

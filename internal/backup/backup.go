@@ -19,7 +19,7 @@ var rdsKey string
 
 func init() {
 	rds = redish.Client
-	rdsKey = config.RdsKey
+	rdsKey = config.RedisKey()
 }
 
 // Sync is used to pull or push redis backup, decided by different cases.

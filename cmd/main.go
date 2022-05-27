@@ -6,6 +6,7 @@ import (
 	"find/internal/order"
 	"find/internal/reminder"
 	"find/internal/stdin"
+	"find/internal/weather"
 	"fmt"
 	"os"
 )
@@ -36,6 +37,9 @@ func main() {
 			continue
 		}
 
+		var fast bool
+		var all bool
+
 		param := order.Param(input)
 
 		switch order.Order(input) {
@@ -62,8 +66,6 @@ func main() {
 			}
 			succeed()
 		case order.Delete:
-			var fast bool
-			var all bool
 			fast, param = order.Fast(param)
 			all, param = order.All(param)
 			err = note.Delete(param, !fast, !all)
@@ -79,6 +81,17 @@ func main() {
 				continue
 			}
 			succeed()
+		case order.Weather:
+			all, param = order.All(param)
+			if param == "" {
+				fmt.Printf("Need address.\n")
+				continue
+			}
+			err = weather.Search(param, all)
+			if err != nil {
+				fmt.Printf("search weather error: %s\n", err.Error())
+				continue
+			}
 		case order.Exit:
 			os.Exit(1)
 		}

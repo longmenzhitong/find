@@ -55,6 +55,15 @@ If the old note doesn't exist, this order is equivalent to add.
 
 This order asynchronously updates the backup if the backup service is available.
 
+#### Weather
+Example:
+```shell
+weather 北京市昌平区
+```
+It'll print the weather of 北京市昌平区.
+
+Support china address only.
+
 #### Exit
 Example:
 ```shell

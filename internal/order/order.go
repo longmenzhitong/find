@@ -4,11 +4,12 @@ package order
 import "strings"
 
 const (
-	Find   = "find"
-	Add    = "add"
-	Delete = "del"
-	Modify = "mod"
-	Exit   = "exit"
+	Find    = "find"
+	Add     = "add"
+	Delete  = "del"
+	Modify  = "mod"
+	Exit    = "exit"
+	Weather = "weather"
 )
 
 // orders is a string slice persist all of order.
@@ -18,6 +19,7 @@ var orders = []string{
 	Delete,
 	Modify,
 	Exit,
+	Weather,
 }
 
 // Order is used to parse order from user's input,

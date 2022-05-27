@@ -6,13 +6,21 @@ import (
 	"find/internal/note"
 	"fmt"
 	"github.com/go-toast/toast"
+	"github.com/jordan-wright/email"
 	"github.com/robfig/cron"
+	"net/smtp"
 	"strings"
+	"sync"
 	"time"
 )
 
 const needRemind = "remind@"
 const reminded = "reminded@"
+const reminderTypeWindows = "win"
+const reminderTypeEmail = "email"
+
+// mutex is used to ensure that the reminder is checking to-do notes serially.
+var mutex sync.Mutex
 
 // Start is used to start a reminder, checking to-do notes with specified interval seconds,
 // sending a windows desktop notification for necessary. It'll modify 'remind@' to 'reminded@'
@@ -21,6 +29,7 @@ func Start() error {
 	c := cron.New()
 	spec := fmt.Sprintf("*/%d * * * * ?", config.Conf.Reminder.IntervalSeconds)
 	err := c.AddFunc(spec, func() {
+		mutex.Lock()
 		notes, err := note.Find("todo", true, false, false)
 		if err != nil {
 			fmt.Printf("find todo error: %s\n", err.Error())
@@ -43,18 +52,35 @@ func Start() error {
 			}
 
 			if time.Now().Unix() > remindTime {
-				err = remind(key, val)
-				if err != nil {
-					fmt.Printf("remind %s error: %s\n", key, err.Error())
-					continue
+				remindSucceed := false
+				if strings.Contains(config.Conf.Reminder.Type, reminderTypeWindows) {
+					err = remindByWindows(key, val)
+					if err != nil {
+						fmt.Printf("remind %s by windows error: %s\n", key, err.Error())
+					} else {
+						remindSucceed = true
+					}
 				}
-				newNote := strings.ReplaceAll(_note, needRemind, reminded)
-				err = note.Modify(newNote)
-				if err != nil {
-					fmt.Printf("modify %s error: %s\n", newNote, err.Error())
+
+				if strings.Contains(config.Conf.Reminder.Type, reminderTypeEmail) {
+					err = remindByEmail(key, val)
+					if err != nil {
+						fmt.Printf("remind %s by email error: %s\n", key, err.Error())
+					} else {
+						remindSucceed = true
+					}
+				}
+
+				if remindSucceed {
+					newNote := strings.ReplaceAll(_note, needRemind, reminded)
+					err = note.Modify(newNote)
+					if err != nil {
+						fmt.Printf("modify %s error: %s\n", newNote, err.Error())
+					}
 				}
 			}
 		}
+		mutex.Unlock()
 	})
 	if err != nil {
 		return fmt.Errorf("add func to cron error: %v", err)
@@ -77,8 +103,8 @@ func parseRemindTime(timeStr string) (int64, error) {
 	return -1, err
 }
 
-// remind is used to send a windows desktop notification.
-func remind(title, message string) error {
+// remindByWindows is used to send a windows notification.
+func remindByWindows(title, message string) error {
 	n := toast.Notification{
 		AppID:   "Microsoft.Windows.Shell.RunDialog",
 		Title:   title,
@@ -89,4 +115,20 @@ func remind(title, message string) error {
 		},
 	}
 	return n.Push()
+}
+
+// remindByEmail is used to send a email notification.
+func remindByEmail(title, message string) error {
+	em := email.NewEmail()
+	em.From = fmt.Sprintf("FIND <%s>", config.Conf.Email.From)
+	em.To = config.Conf.Email.To
+	em.Subject = title
+	em.Text = []byte(message)
+	err := em.Send(
+		"smtp.qq.com:25",
+		smtp.PlainAuth("", config.Conf.Email.From, config.Conf.Email.AuthCode, "smtp.qq.com"))
+	if err != nil {
+		return fmt.Errorf("send email error: %v", err)
+	}
+	return nil
 }

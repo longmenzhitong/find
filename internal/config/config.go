@@ -23,9 +23,15 @@ type Config struct {
 		Db       int    `yaml:"db"`
 	} `yaml:"redis"`
 	Reminder struct {
-		Enabled         bool `yaml:"enabled"`
-		IntervalSeconds int  `yaml:"interval-seconds"`
+		Enabled         bool   `yaml:"enabled"`
+		Type            string `yaml:"type"`
+		IntervalSeconds int    `yaml:"interval-seconds"`
 	} `yaml:"reminder"`
+	Email struct {
+		From     string   `yaml:"from"`
+		To       []string `yaml:"to"`
+		AuthCode string   `yaml:"authCode"`
+	}
 }
 
 // all configs
@@ -92,7 +98,7 @@ func initYaml(confPath string) error {
 
 	initialConfigs := []string{
 		"find:",
-		fmt.Sprintf("  notePath: %s", homedir+"\\FIND.txt"),
+		"  notePath: " + homedir + "\\FIND.txt",
 		"  username:",
 		"  password:",
 		"redis:",
@@ -101,7 +107,12 @@ func initYaml(confPath string) error {
 		"  db:",
 		"reminder:",
 		"  enabled: true",
+		"  type: win",
 		"  interval-seconds: 1",
+		"email:",
+		"  from:",
+		"  to:",
+		"  authCode:",
 	}
 	err = files.WriteLinesToFile(file, &initialConfigs)
 	if err != nil {

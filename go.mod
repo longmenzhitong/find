@@ -5,6 +5,7 @@ go 1.17
 require (
 	github.com/go-redis/redis v6.15.9+incompatible
 	github.com/go-toast/toast v0.0.0-20190211030409-01e6764cf0a4
+	github.com/jordan-wright/email v4.0.1-0.20210109023952-943e75fe5223+incompatible
 	github.com/robfig/cron v1.2.0
 	gopkg.in/yaml.v2 v2.4.0
 )

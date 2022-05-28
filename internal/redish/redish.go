@@ -12,7 +12,7 @@ import (
 var Client *redis.Client
 
 func init() {
-	if config.Conf.Redis.Address != "" {
+	if config.Conf.Backup.Redis.Address != "" {
 		client := redis.NewClient(config.RedisConf())
 		_, err := client.Ping().Result()
 		if err != nil {

@@ -120,13 +120,14 @@ func remindByWindows(title, message string) error {
 // remindByEmail is used to send a email notification.
 func remindByEmail(title, message string) error {
 	em := email.NewEmail()
-	em.From = fmt.Sprintf("FIND <%s>", config.Conf.Email.From)
-	em.To = config.Conf.Email.To
+	from := config.Conf.Reminder.Email.From
+	em.From = fmt.Sprintf("FIND <%s>", from)
+	em.To = config.Conf.Reminder.Email.To
 	em.Subject = title
 	em.Text = []byte(message)
 
-	addr := config.Conf.Email.Server
-	err := em.Send(addr, smtp.PlainAuth("", config.Conf.Email.From, config.Conf.Email.AuthCode, strings.Split(addr, ":")[0]))
+	addr := config.Conf.Reminder.Email.Server
+	err := em.Send(addr, smtp.PlainAuth("", from, config.Conf.Reminder.Email.AuthCode, strings.Split(addr, ":")[0]))
 	if err != nil {
 		return fmt.Errorf("send email error: %v", err)
 	}

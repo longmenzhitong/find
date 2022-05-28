@@ -17,22 +17,24 @@ type Config struct {
 		Username string `yaml:"username"`
 		Password string `yaml:"password"`
 	} `yaml:"find"`
-	Redis struct {
-		Address  string `yaml:"address"`
-		Password string `yaml:"password"`
-		Db       int    `yaml:"db"`
-	} `yaml:"redis"`
+	Backup struct {
+		Redis struct {
+			Address  string `yaml:"address"`
+			Password string `yaml:"password"`
+			Db       int    `yaml:"db"`
+		} `yaml:"redis"`
+	} `yaml:"backup"`
 	Reminder struct {
 		Enabled         bool   `yaml:"enabled"`
 		Type            string `yaml:"type"`
 		IntervalSeconds int    `yaml:"interval-seconds"`
+		Email           struct {
+			Server   string   `yaml:"server"`
+			From     string   `yaml:"from"`
+			To       []string `yaml:"to"`
+			AuthCode string   `yaml:"authCode"`
+		} `yaml:"email"`
 	} `yaml:"reminder"`
-	Email struct {
-		Server   string   `yaml:"server"`
-		From     string   `yaml:"from"`
-		To       []string `yaml:"to"`
-		AuthCode string   `yaml:"authCode"`
-	}
 }
 
 // all configs
@@ -79,9 +81,9 @@ func RedisKey() string {
 // RedisConf is used to get redis config for backup.
 func RedisConf() *redis.Options {
 	return &redis.Options{
-		Addr:     Conf.Redis.Address,
-		Password: Conf.Redis.Password,
-		DB:       Conf.Redis.Db,
+		Addr:     Conf.Backup.Redis.Address,
+		Password: Conf.Backup.Redis.Password,
+		DB:       Conf.Backup.Redis.Db,
 	}
 }
 
@@ -102,19 +104,20 @@ func initYaml(confPath string) error {
 		"  notePath: " + homedir + "\\FIND.txt",
 		"  username:",
 		"  password:",
-		"redis:",
-		"  address:",
-		"  password:",
-		"  db:",
+		"backup:",
+		"  redis:",
+		"    address:",
+		"    password:",
+		"    db:",
 		"reminder:",
 		"  enabled: true",
 		"  type: win",
 		"  interval-seconds: 1",
-		"email:",
-		"  server:",
-		"  from:",
-		"  to:",
-		"  authCode:",
+		"  email:",
+		"    server:",
+		"    from:",
+		"    to:",
+		"    authCode:",
 	}
 	err = files.WriteLinesToFile(file, &initialConfigs)
 	if err != nil {

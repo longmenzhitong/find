@@ -5,6 +5,7 @@ import (
 	"find/internal/files"
 	"fmt"
 	"github.com/go-redis/redis"
+	uuid "github.com/nu7hatch/gouuid"
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
@@ -15,7 +16,6 @@ type Config struct {
 	Find struct {
 		NotePath string `yaml:"notePath"`
 		Username string `yaml:"username"`
-		Password string `yaml:"password"`
 	} `yaml:"find"`
 	Backup struct {
 		Redis struct {
@@ -72,8 +72,8 @@ func init() {
 
 // RedisKey is used to get a redis key for representing backup.
 func RedisKey() string {
-	if Conf.Find.Username != "" && Conf.Find.Password != "" {
-		return Conf.Find.Username + ":" + Conf.Find.Password
+	if Conf.Find.Username != "" {
+		return "find:backup:" + Conf.Find.Username
 	}
 	return ""
 }
@@ -96,16 +96,19 @@ func initYaml(confPath string) error {
 
 	homedir, err := os.UserHomeDir()
 	if err != nil {
-		panic(err)
+		return fmt.Errorf("get user home dir error: %v", err)
+	}
+
+	_uuid, err := uuid.NewV4()
+	if err != nil {
+		return fmt.Errorf("generate username error: %v", err)
 	}
 
 	initialConfigs := []string{
 		"find:",
 		"  notePath: " + homedir + "\\FIND.txt",
-		"  ## username is necessary for backup",
-		"  username:",
-		"  ## password is necessary for backup",
-		"  password:",
+		"  ## username is necessary for backup.",
+		"  username: " + _uuid.String(),
 		"backup:",
 		"  redis:",
 		"    address:",
@@ -113,14 +116,19 @@ func initYaml(confPath string) error {
 		"    db:",
 		"reminder:",
 		"  enabled: true",
-		"  ## type can be multiple, for example: win,email",
+		"  ## type is ways to remind, for now support:",
+		"  ## 1.windows notification(win),",
+		"  ## 2.email(email),",
+		"  ## example: win,email.",
 		"  type: win",
 		"  interval-seconds: 1",
 		"  email:",
-		"    ## server port is necessary, for example: smtp.163.com:25",
+		"    ## server is a smtp host with port,",
+		"    ## example: smtp.163.com:25.",
 		"    server:",
 		"    from:",
-		"    ## to is a list, for example: [aaa@163.com,bbb@163.com]",
+		"    ## to is an address list to send remind emails,",
+		"    ## example: [aaa@qq.com,bbb@gmail.com].",
 		"    to:",
 		"    authCode:",
 	}

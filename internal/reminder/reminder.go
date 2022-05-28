@@ -23,7 +23,7 @@ const reminderTypeEmail = "email"
 var mutex sync.Mutex
 
 // Start is used to start a reminder, checking to-do notes with specified interval seconds,
-// sending a windows desktop notification for necessary. It'll modify 'remind@' to 'reminded@'
+// sending notifications for necessary. It'll modify 'remind@' to 'reminded@'
 // for notified notes to avoid duplicate notifications.
 func Start() error {
 	c := cron.New()
@@ -117,7 +117,7 @@ func remindByWindows(title, message string) error {
 	return n.Push()
 }
 
-// remindByEmail is used to send a email notification.
+// remindByEmail is used to send a email.
 func remindByEmail(title, message string) error {
 	em := email.NewEmail()
 	from := config.Conf.Reminder.Email.From

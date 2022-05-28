@@ -28,6 +28,7 @@ type Config struct {
 		IntervalSeconds int    `yaml:"interval-seconds"`
 	} `yaml:"reminder"`
 	Email struct {
+		Server   string   `yaml:"server"`
 		From     string   `yaml:"from"`
 		To       []string `yaml:"to"`
 		AuthCode string   `yaml:"authCode"`
@@ -110,6 +111,7 @@ func initYaml(confPath string) error {
 		"  type: win",
 		"  interval-seconds: 1",
 		"email:",
+		"  server:",
 		"  from:",
 		"  to:",
 		"  authCode:",

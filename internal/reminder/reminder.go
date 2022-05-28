@@ -124,9 +124,9 @@ func remindByEmail(title, message string) error {
 	em.To = config.Conf.Email.To
 	em.Subject = title
 	em.Text = []byte(message)
-	err := em.Send(
-		"smtp.qq.com:25",
-		smtp.PlainAuth("", config.Conf.Email.From, config.Conf.Email.AuthCode, "smtp.qq.com"))
+
+	addr := config.Conf.Email.Server
+	err := em.Send(addr, smtp.PlainAuth("", config.Conf.Email.From, config.Conf.Email.AuthCode, strings.Split(addr, ":")[0]))
 	if err != nil {
 		return fmt.Errorf("send email error: %v", err)
 	}

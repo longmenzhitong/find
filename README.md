@@ -91,6 +91,8 @@ The reminder accept 2 formats of remind-time, which accurate to minutes:
 
 FIND support multiple ways to remind you, for now the list is:
 1. desktop notification(windows only, which is default)
-2. email notification(qq only)
+2. email notification(qq and 163 is tested)
 
-You need an auth code of qq email if you want to use email notification, refer to [qq email auth code](https://service.mail.qq.com/cgi-bin/help?subtype=1&id=28&no=1001256).
+Refer to:
+1. [qq email auth code](https://service.mail.qq.com/cgi-bin/help?subtype=1&id=28&no=1001256)
+2. [163 email auth code](https://note.youdao.com/ynoteshare/index.html?id=f9fef46114fb922b45460f4f55d96853&type=note&_time=1653706639600)

@@ -17,6 +17,11 @@ type Config struct {
 		NotePath string `yaml:"notePath"`
 		Username string `yaml:"username"`
 	} `yaml:"find"`
+	Log struct {
+		Enabled bool   `yaml:"enabled"`
+		Path    string `yaml:"path"`
+		Level   string `yaml:"level"`
+	} `yaml:"log"`
 	Backup struct {
 		Redis struct {
 			Address  string `yaml:"address"`
@@ -109,6 +114,16 @@ func initYaml(confPath string) error {
 		"  notePath: " + homedir + "\\FIND.txt",
 		"  ## username is necessary for backup.",
 		"  username: " + _uuid.String(),
+		"log:",
+		"  enabled: true",
+		"  path: " + homedir + "\\FIND.log",
+		"  ## level contains:",
+		"  ## 1.debug(most detailed)",
+		"  ## 2.info",
+		"  ## 3.warn",
+		"  ## 4.error(most concise)",
+		"  ## example: info",
+		"  level: debug",
 		"backup:",
 		"  redis:",
 		"    address:",

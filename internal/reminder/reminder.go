@@ -3,6 +3,7 @@ package reminder
 
 import (
 	"find/internal/config"
+	"find/internal/logs"
 	"find/internal/note"
 	"fmt"
 	"github.com/go-toast/toast"
@@ -30,9 +31,10 @@ func Start() error {
 	spec := fmt.Sprintf("*/%d * * * * ?", config.Conf.Reminder.IntervalSeconds)
 	err := c.AddFunc(spec, func() {
 		mutex.Lock()
+		logs.Debug("reminder: check start")
 		notes, err := note.Find("todo", true, false, false)
 		if err != nil {
-			fmt.Printf("find todo error: %s\n", err.Error())
+			logs.Error("find todo error: %s\n", err.Error())
 			return
 		}
 
@@ -47,7 +49,7 @@ func Start() error {
 			timeStr := strings.TrimSpace(strings.Split(val, needRemind)[1])
 			remindTime, err := parseRemindTime(timeStr)
 			if err != nil {
-				fmt.Printf("parse remind time of %s error: %s\n", timeStr, err.Error())
+				logs.Error("parse remind time of %s error: %s\n", timeStr, err.Error())
 				continue
 			}
 
@@ -56,7 +58,7 @@ func Start() error {
 				if strings.Contains(config.Conf.Reminder.Type, reminderTypeWindows) {
 					err = remindByWindows(key, val)
 					if err != nil {
-						fmt.Printf("remind %s by windows error: %s\n", key, err.Error())
+						logs.Error("remind %s by windows error: %s\n", key, err.Error())
 					} else {
 						remindSucceed = true
 					}
@@ -65,7 +67,7 @@ func Start() error {
 				if strings.Contains(config.Conf.Reminder.Type, reminderTypeEmail) {
 					err = remindByEmail(key, val)
 					if err != nil {
-						fmt.Printf("remind %s by email error: %s\n", key, err.Error())
+						logs.Error("remind %s by email error: %s\n", key, err.Error())
 					} else {
 						remindSucceed = true
 					}
@@ -75,11 +77,12 @@ func Start() error {
 					newNote := strings.ReplaceAll(_note, needRemind, reminded)
 					err = note.Modify(newNote)
 					if err != nil {
-						fmt.Printf("modify %s error: %s\n", newNote, err.Error())
+						logs.Error("modify %s error: %s\n", newNote, err.Error())
 					}
 				}
 			}
 		}
+		logs.Debug("reminder: check finished")
 		mutex.Unlock()
 	})
 	if err != nil {

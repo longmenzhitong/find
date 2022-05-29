@@ -6,6 +6,7 @@ import (
 	"find/internal/config"
 	"find/internal/constant"
 	"find/internal/files"
+	"find/internal/logs"
 	"find/internal/redish"
 	"find/internal/stdin"
 	"fmt"
@@ -121,7 +122,7 @@ func Write(notes *[]string, mod int) error {
 	go func() {
 		err = Check()
 		if err != nil {
-			fmt.Printf("check note error: %s", err.Error())
+			logs.Error("check note error: %s", err.Error())
 		}
 	}()
 

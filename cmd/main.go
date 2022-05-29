@@ -2,6 +2,7 @@ package main
 
 import (
 	"find/internal/config"
+	"find/internal/logs"
 	"find/internal/note"
 	"find/internal/order"
 	"find/internal/reminder"
@@ -14,17 +15,19 @@ import (
 func init() {
 	err := note.Check()
 	if err != nil {
-		fmt.Printf("check note error: %s\n", err.Error())
+		logs.Error("check note error: %s\n", err.Error())
 	}
-}
-
-func main() {
 	if config.Conf.Reminder.Enabled {
 		err := reminder.Start()
 		if err != nil {
-			fmt.Printf("start reminder error: %s\n", err.Error())
+			logs.Error("start reminder error: %s\n", err.Error())
 		}
 	}
+	logs.Info("initialization finished")
+}
+
+func main() {
+	logs.Info("FIND started")
 
 	fmt.Println("=================")
 	fmt.Println("Welcome to FIND!")
@@ -33,7 +36,7 @@ func main() {
 		fmt.Print("[FIND]# ")
 		input, err := stdin.ReadString()
 		if err != nil {
-			fmt.Printf("read input error: %s\n", err.Error())
+			logs.Error("read input error: %s\n", err.Error())
 			continue
 		}
 
@@ -46,13 +49,13 @@ func main() {
 		case order.Find:
 			_, err = note.Find(param, true, false, true)
 			if err != nil {
-				fmt.Printf("find %s error: %s\n", param, err.Error())
+				logs.Error("find %s error: %s\n", param, err.Error())
 				continue
 			}
 		case order.Add:
 			same, err := note.Find(note.GetKey(param), true, true, false)
 			if err != nil {
-				fmt.Printf("find %s error: %s\n", note.GetKey(param), err.Error())
+				logs.Error("find %s before add error: %s\n", note.GetKey(param), err.Error())
 				continue
 			}
 			if len(same) > 0 {
@@ -61,7 +64,7 @@ func main() {
 			}
 			err = note.Write(&[]string{param}, os.O_APPEND)
 			if err != nil {
-				fmt.Printf("append note error: %s\n", err.Error())
+				logs.Error("add %s error: %s\n", param, err.Error())
 				continue
 			}
 			succeed()
@@ -70,26 +73,26 @@ func main() {
 			all, param = order.All(param)
 			err = note.Delete(param, !fast, !all)
 			if err != nil {
-				fmt.Printf("delete note error: %s\n", err.Error())
+				logs.Error("delete %s error: %s\n", param, err.Error())
 				continue
 			}
 			succeed()
 		case order.Modify:
 			err = note.Modify(param)
 			if err != nil {
-				fmt.Printf("modify %s error: %s\n", param, err.Error())
+				logs.Error("modify %s error: %s\n", param, err.Error())
 				continue
 			}
 			succeed()
 		case order.Weather:
 			all, param = order.All(param)
 			if param == "" {
-				fmt.Printf("Need address.\n")
+				fmt.Println("Need address.")
 				continue
 			}
 			err = weather.Search(param, all)
 			if err != nil {
-				fmt.Printf("search weather error: %s\n", err.Error())
+				logs.Error("search weather of %s error: %s\n", param, err.Error())
 				continue
 			}
 		case order.Exit:

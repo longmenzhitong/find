@@ -4,7 +4,7 @@ package redish
 
 import (
 	"find/internal/config"
-	"fmt"
+	"find/internal/logs"
 	"github.com/go-redis/redis"
 )
 
@@ -16,7 +16,7 @@ func init() {
 		client := redis.NewClient(config.RedisConf())
 		_, err := client.Ping().Result()
 		if err != nil {
-			fmt.Printf("ping redis error: %s\n", err.Error())
+			logs.Error("ping redis error: %s\n", err.Error())
 		} else {
 			Client = client
 		}

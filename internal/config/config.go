@@ -123,7 +123,7 @@ func initYaml(confPath string) error {
 		"  ## 3.warn",
 		"  ## 4.error(most concise)",
 		"  ## example: info",
-		"  level: debug",
+		"  level: info",
 		"backup:",
 		"  redis:",
 		"    address:",

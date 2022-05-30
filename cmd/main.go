@@ -23,11 +23,11 @@ func init() {
 			logs.Error("start reminder error: %s\n", err.Error())
 		}
 	}
-	logs.Info("%+v\n", config.Conf)
 }
 
 func main() {
-	logs.Info("FIND started")
+	logs.Info("FIND started with configs: ")
+	logs.Config()
 
 	fmt.Println("=================")
 	fmt.Println("Welcome to FIND!")

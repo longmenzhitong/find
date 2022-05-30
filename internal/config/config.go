@@ -9,6 +9,8 @@ import (
 	"gopkg.in/yaml.v2"
 	"io/ioutil"
 	"os"
+	"strconv"
+	"strings"
 )
 
 // Config map to program config yaml.
@@ -153,4 +155,31 @@ func initYaml(confPath string) error {
 	}
 
 	return nil
+}
+
+// Configs is used to provide a string slice for recording, returning the slice.
+func Configs() []string {
+	return []string{
+		"find:",
+		"  notePath: " + Conf.Find.NotePath,
+		"  username: " + Conf.Find.Username,
+		"log:",
+		"  enabled: " + strconv.FormatBool(Conf.Log.Enabled),
+		"  path: " + Conf.Log.Path,
+		"  level: " + Conf.Log.Level,
+		"backup:",
+		"  redis:",
+		"    address: " + Conf.Backup.Redis.Address,
+		"    password: " + Conf.Backup.Redis.Password,
+		"    db: " + strconv.Itoa(Conf.Backup.Redis.Db),
+		"reminder:",
+		"  enabled: " + strconv.FormatBool(Conf.Reminder.Enabled),
+		"  type: " + Conf.Reminder.Type,
+		"  interval-seconds: " + strconv.Itoa(Conf.Reminder.IntervalSeconds),
+		"  email:",
+		"    server: " + Conf.Reminder.Email.Server,
+		"    from: " + Conf.Reminder.Email.From,
+		"    to: " + strings.Join(Conf.Reminder.Email.To, ","),
+		"    authCode: " + Conf.Reminder.Email.AuthCode,
+	}
 }

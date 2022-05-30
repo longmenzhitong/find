@@ -98,3 +98,12 @@ func Error(format string, v ...interface{}) {
 	}
 	fmt.Printf(format, v...)
 }
+
+// Config is used to record all configs.
+func Config() {
+	Info("====================")
+	for _, cfg := range config.Configs() {
+		Info(cfg)
+	}
+	Info("====================")
+}

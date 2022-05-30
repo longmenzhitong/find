@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"find/internal/config"
 	"find/internal/files"
+	"find/internal/logs"
 	"find/internal/redish"
 	"fmt"
 	"github.com/go-redis/redis"
@@ -77,6 +78,7 @@ func Sync(isNewNote bool, file *os.File, fileInfo os.FileInfo) error {
 
 // pull is used to sync newest backup from redis to file.
 func pull(file *os.File) error {
+	logs.Info("backup: pull start")
 	bak, err := getLatest()
 	if err != nil {
 		return fmt.Errorf("get latest bak error: %v", err)
@@ -96,6 +98,7 @@ func pull(file *os.File) error {
 		}
 	}
 
+	logs.Info("backup: pull finished")
 	return nil
 }
 
@@ -111,6 +114,7 @@ func getLatest() (*redis.Z, error) {
 
 // push is used to sync newest backup from file to redis.
 func push(file *os.File, lastModTime float64) error {
+	logs.Info("backup: push start")
 	notes, err := files.ReadLinesFromFile(file)
 	if err != nil {
 		return fmt.Errorf("read lines from %s error: %v", config.Conf.Find.NotePath, err)
@@ -132,5 +136,6 @@ func push(file *os.File, lastModTime float64) error {
 		// json of file's data
 		Member: jsonStr,
 	})
+	logs.Info("backup: push finished")
 	return nil
 }

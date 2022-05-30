@@ -23,7 +23,7 @@ func init() {
 			logs.Error("start reminder error: %s\n", err.Error())
 		}
 	}
-	logs.Info("initialization finished")
+	logs.Info("%+v\n", config.Conf)
 }
 
 func main() {

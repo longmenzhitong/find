@@ -27,6 +27,7 @@ var mutex sync.Mutex
 // sending notifications for necessary. It'll modify 'remind@' to 'reminded@'
 // for notified notes to avoid duplicate notifications.
 func Start() error {
+	logs.Info("reminder: start start")
 	c := cron.New()
 	spec := fmt.Sprintf("*/%d * * * * ?", config.Conf.Reminder.IntervalSeconds)
 	err := c.AddFunc(spec, func() {
@@ -89,6 +90,7 @@ func Start() error {
 		return fmt.Errorf("add func to cron error: %v", err)
 	}
 	c.Start()
+	logs.Info("reminder: start finished")
 	return nil
 }
 

@@ -24,6 +24,7 @@ func init() {
 // Check is used to ensure that the note is available,
 // and then synchronize if redis config is available too.
 func Check() error {
+	logs.Info("note: check start")
 	fileInfo, err := os.Stat(Path)
 	isNewNote := err != nil
 	var file *os.File
@@ -52,6 +53,7 @@ func Check() error {
 		}
 	}
 
+	logs.Info("note: check finished")
 	return nil
 }
 
